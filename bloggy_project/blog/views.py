@@ -28,9 +28,14 @@ def index(request):
     return HttpResponse(t.render(c))
 
 def post(request, post_url):
+    popular_posts = Post.objects.order_by('-views')[:5]
     single_post = get_object_or_404(Post, title=post_url.replace('_', ' '))
     single_post.views += 1      # increment the number of views
     single_post.save()          # and save it
+    context_dict = {
+        'single_post': single_post,
+        'popular_posts': popular_posts,
+    }
     t = loader.get_template('blog/post.html')
-    c = Context({'single_post': single_post, })
+    c = Context(context_dict)
     return HttpResponse(t.render(c))
